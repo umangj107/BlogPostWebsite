@@ -13,6 +13,15 @@ from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from flask_gravatar import Gravatar
 import smtplib
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+EMAIL= os.getenv('EMAIL')
+PASS= os.getenv('PASS')
+TO_ADDR= os.getenv('TO_EMAIL')
+ADMIN_ID= os.getenv('ADMIN_ID')
 
 Base = declarative_base()
 
@@ -80,7 +89,7 @@ def admin_only(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         #if id is not 1 then return abort with 403 error
-        if current_user.id != 1:
+        if current_user.id != ADMIN_ID:
             return abort(403)
 
         #Otherwise continue with the route function
@@ -191,9 +200,9 @@ def contact():
 
         with smtplib.SMTP("smtp.gmail.com") as connection:
             connection.starttls()
-            connection.login(user="umajain107@gmail.com", password="Uj!15111997")
-            connection.sendmail(to_addrs="umangj107@gmail.com",
-                                from_addr="umajain107@gmail.com",
+            connection.login(user=EMAIL, password=PASS)
+            connection.sendmail(to_addrs=TO_ADDR,
+                                from_addr=EMAIL,
                                 msg=f"Subject:You've got a new message.\n\n{email_text}")
 
         return redirect(url_for('get_all_posts'))
